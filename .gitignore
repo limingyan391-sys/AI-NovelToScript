@@ -21,3 +21,7 @@ Desktop.ini
 *.log
 tmp/
 temp/
+
+# Temp scripts
+write-readme.js
+schema/appender.js
