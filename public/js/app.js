@@ -568,10 +568,18 @@
 
 // AI Settings button
 document.getElementById("aiSettingsBtn").addEventListener("click",function(){
-  document.getElementById("aiEndpoint").value = AIService.config.endpoint;
+  var ep = document.getElementById("aiEndpoint");
+  var pr = document.getElementById("aiProvider");
+  if (ep) ep.value = AIService.config.endpoint;
   document.getElementById("aiModel").value = AIService.config.model;
   document.getElementById("aiApiKey").value = AIService.config.apiKey;
+  if (pr) pr.value = AIService.config.provider || "deepseek";
   document.getElementById("aiSettingsModal").classList.add("active");
+});
+document.getElementById("aiProvider").addEventListener("change", function() {
+  var v = this.value;
+  var p = {"deepseek":["https://api.deepseek.com/v1","deepseek-chat"],"openai":["https://api.openai.com/v1","gpt-4o"]};
+  if (p[v]) { document.getElementById("aiEndpoint").value = p[v][0]; document.getElementById("aiModel").value = p[v][1]; }
 });
 
 // AI Save Config
@@ -579,13 +587,11 @@ document.getElementById("aiSaveConfigBtn").addEventListener("click",function(){
   var ep = document.getElementById("aiEndpoint").value.trim();
   var mo = document.getElementById("aiModel").value.trim();
   var ak = document.getElementById("aiApiKey").value.trim();
-  AIService.saveConfig(ep, mo, ak);
+  var pr = (document.getElementById("aiProvider") || {}).value || "deepseek";
+  AIService.saveConfig(ep, mo, ak, pr);
   document.getElementById("aiSettingsModal").classList.remove("active");
   App.showToast("AI 设置已保存","success");
-});
-
-// AI Convert button
-document.getElementById("aiConvertBtn").addEventListener("click",function(){
+});nt.getElementById("aiConvertBtn").addEventListener("click",function(){
   if(!AIService.isConfigured()){
     App.showToast("请先配置 AI API Key","error");
     document.getElementById("aiSettingsModal").classList.add("active");
