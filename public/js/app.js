@@ -549,148 +549,10 @@
 
     // --- Sample novels ---
 
-    getWuxiaSample() {
-      return `第一章 月下惊鸿
-
-时间：戌时
-地点：洛阳城外·听雨亭
-天气：月明星稀
-
-夜色如墨，月华如水。
-
-洛阳城外三里处的听雨亭中，一个白衣身影正独自饮茶。那人背对着月光，看不清面容，只能隐约看见他腰间悬挂的一柄长剑——剑鞘通体漆黑，唯有剑格处一抹暗红，在月光下泛着幽光。
-
-远处传来急促的马蹄声。
-
-"踏踏踏——"
-
-马蹄声由远及近，在听雨亭外戛然而止。
-
-"阁下便是'夜雨剑'沈孤鸿？"马上之人沉声问道。那是个三十出头的黑衣汉子，满面风霜，眼神锐利如鹰。
-
-白衣人缓缓放下茶杯，转过身来。月光洒在他的脸上，那是一张约莫二十五六岁的面容，眉目清冷，却带着三分倦意。
-
-"正是在下。"沈孤鸿淡淡说道，"阁下深夜相邀，所为何事？"
-
-黑衣汉子翻身下马，抱拳道："在下江北铁掌帮帮主雷震天，有一事相求。"
-
-沈孤鸿微微挑眉："雷帮主请讲。"
-
-"三日前，朝廷户部押送的一批饷银在江北道上被劫，共计白银三十万两。"雷震天沉声道，"劫匪留下了这个。"
-
-他从怀中取出一枚令牌，抛向沈孤鸿。
-
-沈孤鸿伸手接住，就着月光细看。令牌通体青铜铸造，正面刻着一个狰狞的狼头，背面则是一个"夜"字。
-
-"夜狼令？"沈孤鸿的瞳孔微微收缩。
-
-"正是。"雷震天点头，"江湖传闻，夜狼令出现在哪里，哪里就会有'夜影'组织的人出没。而能够对付夜影的，据我所知，唯有五年前曾与夜影打过交道的沈公子。"
-
-沈孤鸿沉默了片刻，将令牌收入怀中。
-
-"雷帮主，这件事我接了。"
-
-雷震天大喜过望："多谢沈公子！"
-
-"不过——"沈孤鸿话锋一转，"我需要雷帮主帮我查一件事。"
-
-"沈公子请说。"
-
-"三个月前，苏州知府林家满门被灭一案，雷帮主可曾听闻？"
-
-雷震天的面色顿时变了。";
-    },
-
-    getXianxiaSample() {
-      return `第一章 青云镇
-
-青云镇位于苍澜山脉脚下，是方圆百里内最大的集镇。镇上住了三百余户人家，因靠近仙门青云宗，常有修士往来，比寻常集镇繁华不少。
-
-此刻正值晌午，集市上人来人往，叫卖声不绝于耳。
-
-"新鲜出炉的灵麦包子！一个铜板两个！"
-"上好的玄铁菜刀，削铁如泥！"
-"走过路过不要错过，老张头刚从万妖林采来的十年份灵芝！"
-
-陈小凡蹲在自家馄饨摊前，百无聊赖地用勺子搅着锅里的汤。
-
-摊位冷冷清清，一个客人都没有。
-
-"小凡哥！"一个清脆的声音响起。
-
-陈小凡抬头，看见一个十五六岁的少女蹦蹦跳跳地跑了过来。少女穿着鹅黄色的衣裙，头上扎着双丫髻，一双大眼睛忽闪忽闪的，透着机灵劲儿。
-
-"灵儿？你怎么来了？"陈小凡懒洋洋地问。
-
-"我来给你送好消息啊！"林灵儿兴奋地凑过来，压低声音说，"青云宗今年提前招生了，就在三天后！"
-
-陈小凡手中的勺子"咣当"一声掉进锅里。
-
-"真的？"
-
-"当然是真的！我看过告示了！"林灵儿掏出一张皱巴巴的纸，展开来，"你看——'兹定于七月十五，青云宗大开山门，招收弟子。凡年满十六、资质上佳者，均可前来应试。'"
-
-陈小凡接过告示，来来回回看了三遍，嘴角抑制不住地上扬。
-
-"太好了！"他一拍桌子，"我等这一天等了三年了！"
-
-"可是小凡哥，"林灵儿突然犹豫了一下，"听说这次招生要求很高，至少要灵根纯度在四成以上才行。你——你有灵根吗？"
-
-陈小凡的笑容僵住了。";
-    },
-
-    getUrbanSample() {
-      return `第一章 深夜来电
-
-凌晨两点十七分。
-
-陆沉从睡梦中被手机铃声吵醒时，正梦见自己从一百层的高楼上坠落。他猛地睁开眼睛，心脏砰砰直跳，后背全是冷汗。
-
-手机在床头柜上疯狂震动，屏幕上显示着一个陌生号码。
-
-他犹豫了两秒，还是接了起来。
-
-"喂？"
-
-"请问是陆沉先生吗？"电话那头传来一个女人的声音，冷静，公式化，带着某种说不清道不明的压迫感。
-
-"是我。你是？"
-
-"我叫苏晚晴，是海城市刑警支队的。"女人的声音顿了顿，"很抱歉这么晚打扰你。你认识林晓月吗？"
-
-陆沉的心猛地一沉。
-
-"认识。她是我前女友。怎么了？"
-
-"她死了。"苏晚晴说，"今天下午，在她的公寓里被人发现。法医初步判断死亡时间在四十八小时以上。"
-
-陆沉握着手机的手微微发抖。
-
-"陆先生？你还在吗？"
-
-"我在。"陆沉深吸一口气，"你们怀疑我？"
-
-"我们在她的房间里找到了你的照片，还有一些——"苏晚晴又停顿了一下，"一些关于你的文字。方便的话，希望你能来警局一趟，协助调查。"
-
-陆沉沉默了。
-
-窗外传来一声闷雷，要下雨了。
-
-"好。"他最终说，"我明天上午过去。"
-
-"谢谢你配合。不过——"苏晚晴的语气变得微妙起来，"我想提醒你一件事。"
-
-"什么事？"
-
-"林晓月死的那天晚上，有人看到你出现在她公寓楼下。"
-
-陆沉的瞳孔骤缩。
-
-他挂断电话，看了一眼时间：6月8日，星期二。
-
-而他的记忆告诉他，这三天里他一直在家里赶稿，从未踏出过房门半步。";
-    },
-  };
+    getWuxiaSample() { return ''; },
+    getXianxiaSample() { return ''; },
+    getUrbanSample() { return ''; },
+    };
 
   // Expose App globally
   window.App = App;
@@ -701,168 +563,128 @@
   } else {
     App.init();
   }
-})();
 
+// === AI Integration ===
 
-// --- STATS VIEW ---
+// AI Settings button
+document.getElementById("aiSettingsBtn").addEventListener("click",function(){
+  document.getElementById("aiEndpoint").value = AIService.config.endpoint;
+  document.getElementById("aiModel").value = AIService.config.model;
+  document.getElementById("aiApiKey").value = AIService.config.apiKey;
+  document.getElementById("aiSettingsModal").classList.add("active");
+});
 
+// AI Save Config
+document.getElementById("aiSaveConfigBtn").addEventListener("click",function(){
+  var ep = document.getElementById("aiEndpoint").value.trim();
+  var mo = document.getElementById("aiModel").value.trim();
+  var ak = document.getElementById("aiApiKey").value.trim();
+  AIService.saveConfig(ep, mo, ak);
+  document.getElementById("aiSettingsModal").classList.remove("active");
+  App.showToast("AI 设置已保存","success");
+});
 
-
-
-// --- STATS VIEW ---
-// Append this to app.js to add stats functionality
-
-    renderStats() {
-      const container = document.getElementById('statsContent');
-      if (!scriptData || !novelData) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div>转换小说后自动生成作品分析</div></div>';
-        return;
+// AI Convert button
+document.getElementById("aiConvertBtn").addEventListener("click",function(){
+  if(!AIService.isConfigured()){
+    App.showToast("请先配置 AI API Key","error");
+    document.getElementById("aiSettingsModal").classList.add("active");
+    return;
+  }
+  var text=document.getElementById("novelInput").value.trim();
+  if(!text){App.showToast("请先输入小说文本","error");return;}
+  App.showLoading(true);
+  var format=document.querySelector(".format-btn.active").dataset.format||"film";
+  AIService.convertNovel(text,format).then(function(result){
+    App.showLoading(false);
+    try{
+      var parsed=JSON.parse(result);
+      if(parsed.screenplay||parsed.acts||parsed.metadata){
+        var wrapped=parsed.screenplay?parsed:{screenplay:parsed};
+        novelData={metadata:wrapped.screenplay.metadata||{},characters:wrapped.screenplay.characters||[],chapters:[],rawText:text};
+        scriptData=wrapped;
+        document.getElementById("novelTitle").value=wrapped.screenplay.metadata.title||"";
+        App.updateStats();
+        App.switchTab("preview");
+        App.renderPreview();
+        App.showToast("AI 转换完成！","success");
+      }else{
+        App.showToast("AI 返回格式异常，已在控制台输出","error");
+        console.log(result);
       }
-      
-      const s = scriptData.screenplay;
-      const allDialogues = [];
-      for (const act of s.acts) {
-        for (const scene of act.scenes) {
-          for (const block of scene.content) {
-            if (block.type === 'dialogue' && block.speaker) {
-              allDialogues.push(block);
-            }
-          }
-        }
-      }
-
-      // Word count stats
-      let totalChars = 0;
-      let dialogueChars = 0;
-      let actionChars = 0;
-      for (const act of s.acts) {
-        for (const scene of act.scenes) {
-          for (const block of scene.content) {
-            if (block.type === 'dialogue') {
-              dialogueChars += (block.line || '').length;
-            } else if (block.type === 'action') {
-              actionChars += (block.description || '').length;
-            }
-            if (block.line) totalChars += block.line.length;
-            if (block.description) totalChars += block.description.length;
-          }
-        }
-      }
-
-      const dialogueRatio = totalChars > 0 ? (dialogueChars / totalChars * 100).toFixed(1) : 0;
-      const actionRatio = totalChars > 0 ? (actionChars / totalChars * 100).toFixed(1) : 0;
-
-      // Character speaking stats
-      const speakerStats = {};
-      for (const d of allDialogues) {
-        if (!speakerStats[d.speaker]) speakerStats[d.speaker] = { lines: 0, chars: 0 };
-        speakerStats[d.speaker].lines++;
-        speakerStats[d.speaker].chars += (d.line || '').length;
-      }
-      const topSpeakers = Object.entries(speakerStats)
-        .sort((a, b) => b[1].lines - a[1].lines)
-        .slice(0, 5);
-
-      // Scene distribution
-      const scenesPerAct = s.acts.map(a => ({
-        title: a.title,
-        count: a.scenes.length,
-        locations: [...new Set(a.scenes.map(sc => sc.setting?.location).filter(Boolean))],
-      }));
-
-      // Location frequency
-      const locationFreq = {};
-      for (const act of s.acts) {
-        for (const scene of act.scenes) {
-          if (scene.setting?.location) {
-            locationFreq[scene.setting.location] = (locationFreq[scene.setting.location] || 0) + 1;
-          }
-        }
-      }
-      const topLocations = Object.entries(locationFreq).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-      let html = '<div style="display:grid;gap:20px">';
-
-      // Overview card
-      html += `<div class="act-section">
-        <div class="act-header"><span class="act-badge">📊 作品概览</span></div>
-        <div style="padding:16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
-            <div><span style="color:var(--text-muted);font-size:0.8rem">总字符数</span><div style="font-size:1.2rem;font-weight:600">${totalChars}</div></div>
-            <div><span style="color:var(--text-muted);font-size:0.8rem">对话占比</span><div style="font-size:1.2rem;font-weight:600;color:var(--accent-warm)">${dialogueRatio}%</div></div>
-            <div><span style="color:var(--text-muted);font-size:0.8rem">描写占比</span><div style="font-size:1.2rem;font-weight:600;color:var(--accent-secondary)">${actionRatio}%</div></div>
-            <div><span style="color:var(--text-muted);font-size:0.8rem">总台词数</span><div style="font-size:1.2rem;font-weight:600">${allDialogues.length} 句</div></div>
-          </div>
-        </div>
-      </div>`;
-
-      // Top speakers
-      if (topSpeakers.length > 0) {
-        html += `<div class="act-section">
-          <div class="act-header"><span class="act-badge">🎭 台词量 Top 5</span></div>
-          <div style="padding:16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)">`;
-        const maxLines = topSpeakers[0][1].lines;
-        for (const [name, stats] of topSpeakers) {
-          const pct = (stats.lines / maxLines * 100).toFixed(0);
-          html += `<div style="margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:4px">
-              <span>${this.escapeHtml(name)}</span>
-              <span style="color:var(--text-muted)">${stats.lines} 句 / ${stats.chars} 字</span>
-            </div>
-            <div style="height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden">
-              <div style="height:100%;width:${pct}%;background:var(--accent-gradient);border-radius:3px;transition:width 0.5s ease"></div>
-            </div>
-          </div>`;
-        }
-        html += `</div></div>`;
-      }
-
-      // Scene distribution by act
-      html += `<div class="act-section">
-        <div class="act-header"><span class="act-badge">📋 各幕场景分布</span></div>
-        <div style="display:grid;gap:8px">`;
-      for (const act of scenesPerAct) {
-        html += `<div style="padding:12px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="font-weight:600;font-size:0.9rem">${this.escapeHtml(act.title)}</span>
-            <span style="color:var(--text-muted);font-size:0.85rem">${act.count} 场</span>
-          </div>`;
-        if (act.locations.length > 0) {
-          html += `<div style="margin-top:6px;color:var(--text-muted);font-size:0.8rem">📍 ${act.locations.join(' · ')}</div>`;
-        }
-        html += `</div>`;
-      }
-      html += `</div></div>`;
-
-      // Top locations
-      if (topLocations.length > 0) {
-        html += `<div class="act-section">
-          <div class="act-header"><span class="act-badge">📍 高频场景地点</span></div>
-          <div style="padding:16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)">`;
-        for (const [loc, count] of topLocations) {
-          html += `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.85rem;border-bottom:1px solid var(--border-color)">
-            <span>📍 ${this.escapeHtml(loc)}</span>
-            <span style="color:var(--text-muted)">${count} 场</span>
-          </div>`;
-        }
-        html += `</div></div>`;
-      }
-
-      // Narrative vs Dialogue suggestion
-      html += `<div class="act-section">
-        <div class="act-header"><span class="act-badge">💡 改编建议</span></div>
-        <div style="padding:16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)">
-          <ul style="padding-left:20px;color:var(--text-secondary);font-size:0.85rem;line-height:2">
-            ${dialogueRatio < 30 ? '<li>当前对话占比较低，建议增加对话以增强戏剧性</li>' : '<li>对话比例适中，适合影视化改编</li>'}
-            ${actionRatio > 60 ? '<li>描写篇幅较多，建议将部分描写转化为视觉动作</li>' : '<li>动作描写比例适当</li>'}
-            ${s.characters.filter(c => c.role === '主角').length === 0 ? '<li>建议明确主角定位，集中剧情冲突</li>' : '<li>主角定位清晰</li>'}
-            ${s.acts.length >= 3 ? '<li>三幕剧结构完整，建议检查每幕高潮点</li>' : '<li>尝试将章节划分为三幕剧结构</li>'}
-            ${totalChars > 5000 ? '<li>篇幅较长，建议适当精简场景数量</li>' : ''}
-          </ul>
-        </div>
-      </div>`;
-
-      html += '</div>';
-      container.innerHTML = html;
+    }catch(e){
+      App.showLoading(false);
+      App.showToast("解析AI响应失败: "+e.message,"error");
     }
+  }).catch(function(e){
+    App.showLoading(false);
+    App.showToast("AI 调用失败: "+e.message,"error");
+  });
+});
 
+// AI Polish button
+document.getElementById("aiPolishBtn").addEventListener("click",function(){
+  if(!scriptData){App.showToast("请先转换剧本","error");return;}
+  if(!AIService.isConfigured()){
+    App.showToast("请先配置 AI API Key","error");
+    document.getElementById("aiSettingsModal").classList.add("active");
+    return;
+  }
+  App.showLoading(true);
+  var yaml=YAMLWriter.stringify(scriptData);
+  AIService.polishScript(yaml.substring(0,6000),"提升对话自然度，增强场景描写，优化节奏").then(function(r){
+    App.showLoading(false);
+    var out=document.querySelector(".yaml-output");
+    if(out)out.textContent=out.textContent+"\n\n// === AI 润色建议 ===\n"+r;
+    App.showToast("AI 润色建议已生成","success");
+  }).catch(function(e){
+    App.showLoading(false);
+    App.showToast("AI 润色失败: "+e.message,"error");
+  });
+});
+
+// AI Analyze Characters button
+document.getElementById("aiAnalyzeCharsBtn").addEventListener("click",function(){
+  if(!novelData){App.showToast("请先转换小说","error");return;}
+  if(!AIService.isConfigured()){
+    App.showToast("请先配置 AI API Key","error");
+    document.getElementById("aiSettingsModal").classList.add("active");
+    return;
+  }
+  App.showLoading(true);
+  AIService.analyzeCharacters(novelData.rawText||novelData.chapters[0]?.content||"").then(function(r){
+    App.showLoading(false);
+    var c=document.getElementById("charactersContent");
+    if(c)c.innerHTML=c.innerHTML+"<div style=\'margin-top:16px;padding:16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)\'>"+r.replace(/\n/g,"<br>")+"</div>";
+    App.showToast("AI 角色分析完成","success");
+  }).catch(function(e){
+    App.showLoading(false);
+    App.showToast("AI 分析失败: "+e.message,"error");
+  });
+});
+
+// AI Rewrite Scene button
+document.getElementById("aiRewriteBtn").addEventListener("click",function(){
+  if(!scriptData){App.showToast("请先转换剧本","error");return;}
+  if(!AIService.isConfigured()){
+    App.showToast("请先配置 AI API Key","error");
+    document.getElementById("aiSettingsModal").classList.add("active");
+    return;
+  }
+  App.showLoading(true);
+  var firstScene=scriptData.screenplay.acts[0]?.scenes[0];
+  if(!firstScene){App.showLoading(false);App.showToast("没有找到场景","error");return;}
+  var sceneText=firstScene.content.map(function(b){return b.type==="dialogue"?b.speaker+": "+b.line:b.description}).join("\n");
+  var format=document.querySelector(".format-btn.active")?.dataset.format||"film";
+  AIService.rewriteScene(sceneText,format).then(function(r){
+    App.showLoading(false);
+    App.showToast("AI 场景重写建议已生成","success");
+    var out=document.querySelector(".yaml-output");
+    if(out)out.textContent=out.textContent+"\n\n// === AI 场景重写 ===\n"+r;
+    App.switchTab("script");
+  }).catch(function(e){
+    App.showLoading(false);
+    App.showToast("AI 重写失败: "+e.message,"error");
+  });
+});
+})();

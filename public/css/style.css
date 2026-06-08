@@ -311,3 +311,8 @@ body {
 
 .hidden { display: none !important; }
 .gradient-text { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* AI Features */
+.btn-ai { background: linear-gradient(135deg, #f59e4c, #ef4444); color: white; }
+.btn-ai:hover { box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3); }
+

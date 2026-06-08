@@ -6,22 +6,43 @@
 
 const NovelParser = {
   parse(text, title, author) {
-    const lines = text.split("\n");
+    // Smart auto-detection from content
+    var detectedTitle = title;
+    var detectedAuthor = author;
+    if (!title && text) {
+      var firstLines = text.split('\n').slice(0, 10);
+      var ttl = null, aut = null;
+      for (var i = 0; i < firstLines.length; i++) {
+        var tl = firstLines[i].trim();
+        if (!ttl && tl.indexOf('\u300a') >= 0) {
+          var s = tl.indexOf('\u300a'), e = tl.indexOf('\u300b');
+          if (e > s) ttl = tl.substring(s + 1, e);
+        }
+        if (!aut && (tl.indexOf('\u4f5c\u8005') >= 0 || tl.indexOf('\u8457\u8005') >= 0)) {
+          var m = tl.match(/[\u4f5c\u8457]\u8005[\uff1a: ](.+)/);
+          if (m) aut = m[1].trim();
+        }
+      }
+      if (ttl) detectedTitle = ttl;
+      if (aut) detectedAuthor = aut;
+    }
+    const lines = text.split('\n');
     const cleaned = this._skipPreamble(lines);
     const chapters = this._extractChapters(cleaned);
     return {
       metadata: {
-        title: title || "未命名作品",
-        author: author || "未知作者",
-        source: "原创小说", adaptedBy: "",
-        date: new Date().toISOString().split("T")[0],
-        format: "film", logline: "", genre: [],
+        title: detectedTitle || '\u672a\u547d\u540d\u4f5c\u54c1',
+        author: detectedAuthor || '\u672a\u77e5\u4f5c\u8005',
+        source: '\u539f\u521b\u5c0f\u8bf4', adaptedBy: '',
+        date: new Date().toISOString().split('T')[0],
+        format: 'film', logline: '', genre: [],
       },
       characters: this._extractCharacters(chapters),
       chapters: chapters,
       rawText: text,
     };
   },
+
 
   _skipPreamble(lines) {
     const pats = this._chPatterns();
@@ -32,14 +53,14 @@ const NovelParser = {
     return idx > 0 ? lines.slice(idx) : lines;
   },
 
-  _chPatterns() {
+    _chPatterns() {
     return [
-      /^\s*第\s*[一二三四五六七八九十百千零\d]+\s*章\s*$/,
-      /^\s*第\s*[一二三四五六七八九十百千零\d]+\s*节\s*$/,
-      /^\s*Chapter\s+\d+\s*$/i,
-      /^\s*Part\s+[IVXLCDM]+\s*$/i,
+      /^\s*第\s*[一二三四五六七八九十百千零\d]+\s*章\s*/,
+      /^\s*第\s*[一二三四五六七八九十百千零\d]+\s*节\s*/,
+      /^\s*Chapter\s+\d+\s*/i,
+      /^\s*Part\s+[IVXLCDM]+\s*/i,
       /^\s*(?:序幕|序章|终章|尾声|后记)\s*$/,
-      /^\s*第\s*\d+\s*章\s*$/,
+      /^\s*第\s*\d+\s*章\s*/,
     ];
   },
 

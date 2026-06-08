@@ -32,3 +32,10 @@ test-*
 write-*.js
 schema/appender.js
 *.log
+
+# Build scripts
+_fx.txt
+_fix*.js
+_gen*.js
+_do_*.js
+_build*.js

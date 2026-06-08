@@ -61,6 +61,7 @@
       </div>
       <div class="header-actions">
         <button class="icon-btn" id="themeToggle" title="切换主题">🌓</button>
+          <button class="icon-btn" id="aiSettingsBtn" title="AI 设置">🤖</button>
       </div>
     </header>
 
@@ -83,6 +84,7 @@
       <div class="input-toolbar">
         <div class="toolbar-left">
           <button class="btn btn-primary" id="convertBtn">✦ 开始转换</button>
+          <button class="btn btn-warm" id="aiConvertBtn">🤖 AI 智能转换</button>
           <label class="btn btn-secondary" style="cursor:pointer">
             📁 上传文件
             <input type="file" id="fileInput" accept=".txt,.md" style="display:none">
@@ -116,6 +118,10 @@
           <div class="stat-card"><div class="stat-number" id="statCharacters">0</div><div class="stat-label">角色</div></div>
           <div class="stat-card"><div class="stat-number" id="statPages">0</div><div class="stat-label">预估页数</div></div>
         </div>
+                  <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button class="btn btn-secondary btn-sm" id="aiPolishBtn">🤖 AI 润色剧本</button>
+            <button class="btn btn-ghost btn-sm" id="aiRewriteBtn">🤖 AI 重写选中场景</button>
+          </div>
         <div id="previewContent">
           <div class="empty-state">
             <div class="empty-icon">✦</div>
@@ -128,6 +134,9 @@
       <!-- Tab: Characters -->
       <div class="tab-content" id="tab-characters">
         <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">自动识别小说中的角色，可点击编辑图标完善角色信息</p>
+                  <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button class="btn btn-secondary btn-sm" id="aiAnalyzeCharsBtn">🤖 AI 深度分析角色</button>
+          </div>
         <div id="charactersContent">
           <div class="empty-state"><div class="empty-icon">👥</div><div>转换小说后自动提取角色列表</div></div>
         </div>
@@ -181,6 +190,32 @@
   <script src="js/parser.js"></script>
   <script src="js/script-converter.js"></script>
   <script src="js/yaml-writer.js"></script>
+    <script src="js/ai-service.js"></script>
   <script src="js/app.js"></script>
+  <!-- AI Settings Modal -->
+  <div class="modal-overlay" id="aiSettingsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">🤖 AI 设置</span>
+        <button class="modal-close" onclick="document.getElementById('aiSettingsModal').classList.remove('active')">✕</button>
+      </div>
+      <div class="char-edit-form">
+        <div class="form-group">
+          <label class="form-label">API 地址</label>
+          <input class="form-input" id="aiEndpoint" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">模型名称</label>
+          <input class="form-input" id="aiModel" placeholder="gpt-4o" value="gpt-4o">
+        </div>
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <input class="form-input" id="aiApiKey" type="password" placeholder="sk-...">
+        </div>
+        <button class="btn btn-primary" id="aiSaveConfigBtn" style="width:100%;justify-content:center">保存设置</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
