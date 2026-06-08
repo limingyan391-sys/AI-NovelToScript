@@ -13,18 +13,33 @@ const NovelParser = {
       var ttl = null, aut = null;
       for (var i = 0; i < firstLines.length; i++) {
         var tl = firstLines[i].trim();
+        if (!tl) continue;
+        // Author: ??/??
+        if (!aut) {
+          var am = tl.match(/[\u4f5c\u8457]\u8005[\uff1a: ](.+)/);
+          if (am) { aut = am[1].trim(); continue; }
+        }
+        // Title from ??
         if (!ttl && tl.indexOf("\u300a") >= 0) {
           var s = tl.indexOf("\u300a"), e = tl.indexOf("\u300b");
-          if (e > s) ttl = tl.substring(s + 1, e);
+          if (e > s) { ttl = tl.substring(s + 1, e); continue; }
         }
-        if (!aut && (tl.indexOf("\u4f5c\u8005") >= 0 || tl.indexOf("\u8457\u8005") >= 0)) {
-          var m = tl.match(/[\u4f5c\u8457]\u8005[\uff1a: ](.+)/);
-          if (m) aut = m[1].trim();
+        // Title: first short line that is not author/desc
+        if (!ttl && tl.length < 30 && !/^(?:\u7b80\u4ecb|\u5185\u5bb9\u7b80\u4ecb|\u6458\u8981|\u4f5c\u8005|\u8457\u8005)/.test(tl)) {
+          ttl = tl;
         }
       }
       if (ttl) detectedTitle = ttl;
       if (aut) detectedAuthor = aut;
     }
+        // Filter novel disclaimers, HTML artifacts, website junk
+    text = text.replace(/\u672c\u4e66\u7531[^\n]*/ig, '');
+    text = text.replace(/\u9644\uff1a[^\n]*/ig, '');
+    text = text.replace(/\u5982\u4e0d\u614e[^\n]*/ig, '');
+    text = text.replace(/http[s]?:\/\/[^\s\n]+/g, '');
+    text = text.replace(/-{5,}[^-]*?-{5,}/g, '');
+    text = text.replace(/id=\s*["\u201c][^"]*["\u201d][^\n]*/gi, '');
+    text = text.replace(/<[a-zA-Z\/][^>]*>/g, '');
     const lines = text.split("\n");
     const cleaned = this._skipPreamble(lines);
     const chapters = this._extractChapters(cleaned);
@@ -60,8 +75,9 @@ const NovelParser = {
       /^\s*(?:\u5e8f\u5e55|\u5e8f\u7ae0|\u7ec8\u7ae0|\u5c3e\u58f0|\u540e\u8bb0)\s*$/,
       /^\s*\u7b2c\s*\d+\s*\u7ae0/,
       /^\d{4}\s*\u5e74/,
-      /^\s*\u7b2c\s*[\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341\u767e\u5343\u96f6\u6570]\s*\u5377/,    // ???
-      /^\s*\u7b2c\s*\d+\s*\u5377/,    // ?1?
+      /^\u6b63\u6587\s+\d+[\.\u3001]\s*/,
+      /^\s*\u7b2c\s*[\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341\u767e\u5343\u96f6\u6570]\s*\u5377/,
+      /^\s*\u7b2c\s*\d+\s*\u5377/
     ];
   },
 
