@@ -599,7 +599,7 @@ document.getElementById("aiSaveConfigBtn").addEventListener("click",function(){
     document.getElementById("aiSettingsModal").classList.remove("active");
     App.showToast("AI 设置已保存⇒ " + pr + ": " + mo,"success");
   } catch(e) { App.showToast("保存失败: " + e.message,"error"); }
-});nt.getElementById("aiConvertBtn").addEventListener("click",function(){
+});document.getElementById("aiConvertBtn").addEventListener("click",function(){
   if(!AIService.isConfigured()){
     App.showToast("请先配置 AI API Key","error");
     document.getElementById("aiSettingsModal").classList.add("active");
