@@ -702,3 +702,46 @@ document.getElementById("aiRewriteBtn").addEventListener("click",function(){
   });
 });
 })();
+
+// AI Clean Characters button
+document.getElementById("aiCleanCharsBtn").addEventListener("click",function(){
+  if(!novelData||!novelData.characters||novelData.characters.length===0){
+    App.showToast("请先转换小说以提取角色","error");return;
+  }
+  if(!AIService.isConfigured()){
+    App.showToast("请先配置 AI API Key","error");
+    document.getElementById("aiSettingsModal").classList.add("active");
+    return;
+  }
+  App.showLoading(true);
+  var rawNames = novelData.characters.map(function(c){return c.name;});
+  var chText = "";
+  if(novelData.chapters && novelData.chapters.length > 0 && novelData.chapters[0].content){
+    chText = novelData.chapters[0].content.map(function(s){return s.content? s.content.map(function(b){return b.type==="dialogue"?b.speaker+": "+b.line:b.description||b.text||"";}).join("\n"):"";}).join("\n");
+  }
+  AIService.cleanCharacters(rawNames, chText||novelData.rawText||"").then(function(result){
+    App.showLoading(false);
+    try{
+      var parsed = JSON.parse(result);
+      var cleanNames = parsed.characters ? parsed.characters.map(function(c){return c.name;}) : [];
+      if(cleanNames.length===0){App.showToast("AI 未能识别出有效角色名","error");return;}
+      var before = novelData.characters.length;
+      novelData.characters = novelData.characters.filter(function(c){return cleanNames.indexOf(c.name)>=0;});
+      var after = novelData.characters.length;
+      if(scriptData && scriptData.screenplay && scriptData.screenplay.characters){
+        var cleanSet = {};
+        novelData.characters.forEach(function(c){cleanSet[c.name]=true;});
+        scriptData.screenplay.characters = scriptData.screenplay.characters.filter(function(c){return cleanSet[c.name];});
+      }
+      App.renderCharacters();
+      App.showToast("AI 角色名清洗完成：从 "+before+" 个精简到 "+after+" 个","success");
+    }catch(e){
+      App.showToast("解析AI响应失败: "+e.message,"error");
+      console.log(result);
+    }
+  }).catch(function(e){
+    App.showLoading(false);
+    App.showToast("AI 清洗失败: "+e.message,"error");
+  });
+});
+

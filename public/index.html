@@ -136,6 +136,7 @@
         <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">自动识别小说中的角色，可点击编辑图标完善角色信息</p>
                   <div style="display:flex;gap:8px;margin-bottom:12px">
             <button class="btn btn-secondary btn-sm" id="aiAnalyzeCharsBtn">🤖 AI 深度分析角色</button>
+            <button class="btn btn-ghost btn-sm" id="aiCleanCharsBtn">🧹 AI 清洗角色名</button>
           </div>
         <div id="charactersContent">
           <div class="empty-state"><div class="empty-icon">👥</div><div>转换小说后自动提取角色列表</div></div>
@@ -193,10 +194,10 @@
     <script src="js/ai-service.js"></script>
   <script src="js/app.js"></script>
   <!-- AI Settings Modal -->
-  <div class="modal-overlay" id="  <div class="modal-overlay" id="aiSettingsModal">
+  <div class="modal-overlay" id="aiSettingsModal">
     <div class="modal">
       <div class="modal-header">
-        <span class="modal-title">?? AI 设置</span>
+        <span class="modal-title">??>🤖 AI 设置</span>
         <button class="modal-close" onclick="document.getElementById('aiSettingsModal').classList.remove('active')">✕</button>
       </div>
       <div class="char-edit-form">
@@ -227,3 +228,4 @@
 
 </body>
 </html>
+

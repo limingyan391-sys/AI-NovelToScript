@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NovelToScript - ???????? v3
  * Enhanced: handles script-style dialogue, (??) markers, year-based chapters,
  *            standalone character names, Chinese ellipsis, smart name extraction
@@ -155,6 +155,17 @@ const NovelParser = {
     return stops[s] === 1;
   },
 
+  _isValidCharacterName(s) {
+    if (!s) return false;
+    if (s.length < 2 || s.length > 6) return false;
+    if (this._isStopW(s)) return false;
+    // Pure Chinese names only
+    if (!/^[\u4e00-\u9fff\u3400-\u4dbf]+$/.test(s)) return false;
+    return true;
+  },
+
+  },
+
   _cleanName(s) {
     if (!s) return "";
     // Remove trailing adverbs
@@ -286,8 +297,8 @@ const NovelParser = {
         flushNarr();
         if (i > 0 && dialogs.length > 0 && !dialogs[0].speaker) {
           var prevLine = lines[i - 1].trim();
-          var prevIsName = /^[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6}$/.test(prevLine);
-          if (prevIsName && !this._isStopW(prevLine)) {
+          var prevIsName = this._isValidCharacterName(prevLine);
+          if (prevIsName) {
             dialogs[0].speaker = prevLine;
             // Remove if prev line was added as narration
             for (var bi = blocks.length - 1; bi >= 0; bi--) {
@@ -304,8 +315,8 @@ const NovelParser = {
       }
 
       // Check for unquoted dialogue (screenplay format)
-      var isNameLine = /^[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6}$/.test(line);
-      if (isNameLine && !this._isStopW(line) && i + 1 < lines.length) {
+      var isNameLine = this._isValidCharacterName(line);
+      if (isNameLine && i + 1 < lines.length) {
         var nextLine = lines[i + 1].trim();
         var nextQuoted = this._extractAllDialogs(nextLine);
         if (nextQuoted && nextQuoted.length > 0) {
@@ -396,7 +407,7 @@ const NovelParser = {
     if (bestVerb === null || bestIdx < 0) {
       var clean = this._cleanName(text);
       var m = clean.match(/([\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6})$/);
-      if (m && !this._isStopW(m[1]) && m[1] !== "\u5374" && m[1] !== "\u5c31") return m[1];
+      if (m && m[1].length > 1 && !this._isStopW(m[1]) && m[1] !== "\u5374" && m[1] !== "\u5c31" && m[1] !== "\u53c8" && m[1] !== "\u4e5f") return m[1];
       return null;
     }
 
@@ -406,7 +417,7 @@ const NovelParser = {
     if (!beforeVerb) return null;
 
     var m = beforeVerb.match(/([\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6})$/);
-    if (m && !this._isStopW(m[1])) return m[1];
+      if (m && m[1].length > 1 && !this._isStopW(m[1])) return m[1];
 
     var fb = beforeVerb.match(/([\u4e00-\u9fff]{2,4})$/);
     return fb ? fb[1] : null;
@@ -423,14 +434,14 @@ const NovelParser = {
 
     if (bestVerb === null || bestIdx < 0) {
       var m = text.match(/^([\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6})[\s\u3000]/);
-      if (m && !this._isStopW(m[1])) return m[1];
+      if (m && m[1].length > 1 && !this._isStopW(m[1])) return m[1];
       return null;
     }
 
     var beforeVerb = text.substring(0, bestIdx).trim();
     if (!beforeVerb) return null;
     var m = beforeVerb.match(/^[\s\u3000]*([\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6})$/);
-    if (m && !this._isStopW(m[1])) return m[1];
+      if (m && m[1].length > 1 && !this._isStopW(m[1])) return m[1];
     return null;
   },
 
@@ -503,9 +514,12 @@ const NovelParser = {
         if (!scene.content) continue;
         for (var b = 0; b < scene.content.length; b++) {
           var block = scene.content[b];
-          if (block.type === "dialogue" && block.speaker && !map[block.speaker]) {
-            map[block.speaker] = true;
-            names.push(block.speaker);
+          if (block.type === "dialogue" && block.speaker) {
+            var n = block.speaker.trim();
+            if (n && n.length > 1 && !map[n] && this._isValidCharacterName(n)) {
+              map[n] = true;
+              names.push(n);
+            }
           }
         }
       }
@@ -522,3 +536,8 @@ const NovelParser = {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = NovelParser;
 }
+
+
+
+
+
