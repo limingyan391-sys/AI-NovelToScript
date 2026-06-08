@@ -193,36 +193,28 @@
     <script src="js/ai-service.js"></script>
   <script src="js/app.js"></script>
   <!-- AI Settings Modal -->
-  <div class="modal-overlay" id="aiSettingsModal">
+  <div class="modal-overlay" id="  <div class="modal-overlay" id="aiSettingsModal">
     <div class="modal">
       <div class="modal-header">
-        <span class="modal-title">🤖 AI 设置</span>
+        <span class="modal-title">?? AI 设置</span>
         <button class="modal-close" onclick="document.getElementById('aiSettingsModal').classList.remove('active')">✕</button>
       </div>
       <div class="char-edit-form">
         <div class="form-group">
-          <label class="form-label">API 地址</label>
-          <input class="form-input" id="aiEndpoint" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
-        </div>
-        <div class="form-group">
-          <label class="form-label">模型名称</label>
-          <input class="form-input" id="aiModel" placeholder="gpt-4o" value="gpt-4o">
-        </div>
-        <div class="form-group">
-          <label class="form-label">API ???</label>
+          <label class="form-label">API 提供商</label>
           <select class="form-select" id="aiProvider">
             <option value="deepseek">DeepSeek</option>
             <option value="openai">OpenAI</option>
-            <option value="custom">???</option>
+            <option value="custom">自定义</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">API ??</label>
-          <input class="form-input" id="aiEndpoint" placeholder="https://api.deepseek.com/v1">
+          <label class="form-label">API 地址</label>
+          <input class="form-input" id="aiEndpoint" placeholder="https://api.deepseek.com/v1" value="https://api.deepseek.com/v1">
         </div>
         <div class="form-group">
-          <label class="form-label">????</label>
-          <input class="form-input" id="aiModel" placeholder="deepseek-chat">
+          <label class="form-label">模型名称</label>
+          <input class="form-input" id="aiModel" placeholder="deepseek-chat" value="deepseek-chat">
         </div>
         <div class="form-group">
           <label class="form-label">API Key</label>
@@ -231,7 +223,7 @@
         <button class="btn btn-primary" id="aiSaveConfigBtn" style="width:100%;justify-content:center">保存设置</button>
       </div>
     </div>
-  </div>
+  </div></div>
 
 </body>
 </html>

@@ -60,6 +60,8 @@ const NovelParser = {
       /^\s*(?:\u5e8f\u5e55|\u5e8f\u7ae0|\u7ec8\u7ae0|\u5c3e\u58f0|\u540e\u8bb0)\s*$/,
       /^\s*\u7b2c\s*\d+\s*\u7ae0/,
       /^\d{4}\s*\u5e74/,
+      /^\s*\u7b2c\s*[\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341\u767e\u5343\u96f6\u6570]\s*\u5377/,    // ???
+      /^\s*\u7b2c\s*\d+\s*\u5377/,    // ?1?
     ];
   },
 
@@ -187,16 +189,18 @@ const NovelParser = {
 
     // If no chapters matched, treat all text as one chapter
     if (chapters.length === 0) {
-      // Try to use year-based split for content without chapter headers
+      // Only split on year markers if they appear as standalone lines (not followed by much text)
       var yearLines = [];
       var yearCur = null;
+      var yearSplitCount = 0;
       for (var yi = 0; yi < lines.length; yi++) {
         var yl = lines[yi].trim();
-        if (/^\d{4}\s*\u5e74/.test(yl)) {
+        if (/^\d{4}\s*\u5e74/.test(yl) && yl.length < 20) {
           if (yearCur) {
             yearCur.content = this._parseChapterContent(yearLines);
             chapters.push(yearCur);
             yearLines = [];
+            yearSplitCount++;
           }
           yearCur = { title: yl, index: chapters.length + 1, content: [] };
         } else if (yearCur) {
@@ -206,6 +210,11 @@ const NovelParser = {
       if (yearCur && yearLines.length > 0) {
         yearCur.content = this._parseChapterContent(yearLines);
         chapters.push(yearCur);
+        yearSplitCount++;
+      }
+      // If year-based split resulted in 3+ chapters, keep it. Otherwise treat as single chapter.
+      if (yearSplitCount < 3) {
+        chapters = [];
       }
       if (chapters.length === 0) {
         chapters.push({ title: "\u5168\u6587", index: 1, content: this._parseChapterContent(lines) });
