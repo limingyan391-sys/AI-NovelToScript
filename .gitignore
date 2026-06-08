@@ -25,3 +25,10 @@ temp/
 # Temp scripts
 write-readme.js
 schema/appender.js
+
+# Temp/test files
+_*.js
+test-*
+write-*.js
+schema/appender.js
+*.log
