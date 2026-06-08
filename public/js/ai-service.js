@@ -1,21 +1,28 @@
 var AIService = {
   config: {
-    endpoint: localStorage.getItem("ai_endpoint") || "https://api.openai.com/v1",
-    model: localStorage.getItem("ai_model") || "gpt-4o",
-    apiKey: localStorage.getItem("ai_apikey") || ""
+    endpoint: localStorage.getItem("ai_endpoint") || "https://api.deepseek.com/v1",
+    model: localStorage.getItem("ai_model") || "deepseek-chat",
+    apiKey: localStorage.getItem("ai_apikey") || "",
+    provider: localStorage.getItem("ai_provider") || "deepseek",
+    availableModels: {
+      "openai": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
+      "deepseek": ["deepseek-chat", "deepseek-reasoner"],
+    }
   },
 
-  saveConfig: function(ep, mo, ak) {
+  saveConfig: function(ep, mo, ak, provider) {
+    if (provider) this.config.provider = provider;
     this.config.endpoint = ep;
     this.config.model = mo;
     this.config.apiKey = ak;
     localStorage.setItem("ai_endpoint", ep);
     localStorage.setItem("ai_model", mo);
     localStorage.setItem("ai_apikey", ak);
+    localStorage.setItem("ai_provider", this.config.provider);
   },
 
   isConfigured: function() {
-    return !!this.config.apiKey;
+    return !!this.config.apiKey && !!this.config.endpoint;
   },
 
   call: function(messages, opts) {

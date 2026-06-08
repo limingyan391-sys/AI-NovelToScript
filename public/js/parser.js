@@ -1,24 +1,23 @@
-﻿/**
- * NovelToScript - 中文小说解析引擎 v2
- * Fixes: Chinese quotes ("\u201c\u201d"), spaced chapters ("第 1 章"),
- *        post-attribution dialogue, preamble skipping, smart name extraction
+/**
+ * NovelToScript - ???????? v3
+ * Enhanced: handles script-style dialogue, (??) markers, year-based chapters,
+ *            standalone character names, Chinese ellipsis, smart name extraction
  */
 
 const NovelParser = {
   parse(text, title, author) {
-    // Smart auto-detection from content
     var detectedTitle = title;
     var detectedAuthor = author;
     if (!title && text) {
-      var firstLines = text.split('\n').slice(0, 10);
+      var firstLines = text.split("\n").slice(0, 10);
       var ttl = null, aut = null;
       for (var i = 0; i < firstLines.length; i++) {
         var tl = firstLines[i].trim();
-        if (!ttl && tl.indexOf('\u300a') >= 0) {
-          var s = tl.indexOf('\u300a'), e = tl.indexOf('\u300b');
+        if (!ttl && tl.indexOf("\u300a") >= 0) {
+          var s = tl.indexOf("\u300a"), e = tl.indexOf("\u300b");
           if (e > s) ttl = tl.substring(s + 1, e);
         }
-        if (!aut && (tl.indexOf('\u4f5c\u8005') >= 0 || tl.indexOf('\u8457\u8005') >= 0)) {
+        if (!aut && (tl.indexOf("\u4f5c\u8005") >= 0 || tl.indexOf("\u8457\u8005") >= 0)) {
           var m = tl.match(/[\u4f5c\u8457]\u8005[\uff1a: ](.+)/);
           if (m) aut = m[1].trim();
         }
@@ -26,23 +25,22 @@ const NovelParser = {
       if (ttl) detectedTitle = ttl;
       if (aut) detectedAuthor = aut;
     }
-    const lines = text.split('\n');
+    const lines = text.split("\n");
     const cleaned = this._skipPreamble(lines);
     const chapters = this._extractChapters(cleaned);
     return {
       metadata: {
-        title: detectedTitle || '\u672a\u547d\u540d\u4f5c\u54c1',
-        author: detectedAuthor || '\u672a\u77e5\u4f5c\u8005',
-        source: '\u539f\u521b\u5c0f\u8bf4', adaptedBy: '',
-        date: new Date().toISOString().split('T')[0],
-        format: 'film', logline: '', genre: [],
+        title: detectedTitle || "\u672a\u547d\u540d\u4f5c\u54c1",
+        author: detectedAuthor || "\u672a\u77e5\u4f5c\u8005",
+        source: "\u539f\u521b\u5c0f\u8bf4", adaptedBy: "",
+        date: new Date().toISOString().split("T")[0],
+        format: "film", logline: "", genre: [],
       },
       characters: this._extractCharacters(chapters),
       chapters: chapters,
       rawText: text,
     };
   },
-
 
   _skipPreamble(lines) {
     const pats = this._chPatterns();
@@ -53,14 +51,15 @@ const NovelParser = {
     return idx > 0 ? lines.slice(idx) : lines;
   },
 
-    _chPatterns() {
+  _chPatterns() {
     return [
-      /^\s*第\s*[一二三四五六七八九十百千零\d]+\s*章\s*/,
-      /^\s*第\s*[一二三四五六七八九十百千零\d]+\s*节\s*/,
-      /^\s*Chapter\s+\d+\s*/i,
-      /^\s*Part\s+[IVXLCDM]+\s*/i,
-      /^\s*(?:序幕|序章|终章|尾声|后记)\s*$/,
-      /^\s*第\s*\d+\s*章\s*/,
+      /^\s*\u7b2c\s*[\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341\u767e\u5343\u96f6\d]+\s*\u7ae0/,
+      /^\s*\u7b2c\s*[\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341\u767e\u5343\u96f6\d]+\s*\u8282/,
+      /^\s*Chapter\s+\d+/i,
+      /^\s*Part\s+[IVXLCDM]+/i,
+      /^\s*(?:\u5e8f\u5e55|\u5e8f\u7ae0|\u7ec8\u7ae0|\u5c3e\u58f0|\u540e\u8bb0)\s*$/,
+      /^\s*\u7b2c\s*\d+\s*\u7ae0/,
+      /^\d{4}\s*\u5e74/,
     ];
   },
 
@@ -91,67 +90,74 @@ const NovelParser = {
     return -1;
   },
 
-  // --- All speech verbs (longest first for greedy matching) ---
   _speechVerbs: [
-    "解释道","补充道","强调道","重复道","告诉道","吩咐道","命令道",
-    "提醒道","建议道","安慰道","承认道","否认道","批评道","称赞道",
-    "抱怨道","回应道","辩解道","坦白道","炫耀道","回答道",
-    "开心道","幸福道","流泪道","哭着道","笑着道","低声道","小声道",
-    "大声道","尖叫道","咋舌道","无奈道","叹息道","摇头道","点头道",
-    "抬头道","低头道","回头道","插嘴道","接口道","接话道",
-    "忍不住道","不禁道","不由道",
-    "咆哮道","怒吼道","惊呼道","惊叫道","失声道","大吼道",
-    "冷笑道","苦笑道","微笑道","感叹道","感慨道",
-    "心想道","暗想道","寻思道","沉思道",
-    "回答说","解释说","补充说","强调说","重复说",
-    "告诉说","吩咐说","命令说","提醒说","建议说",
-    "鼓励说","安慰说","承认说","否认说","批评说",
-    "称赞说","抱怨说","回应说","辩解说","坦白说",
-    "炫耀说","吹嘘说","胡说道",
-    "问道","说道","喊道","叫道","哭道","吼道","喝道",
-    "骂道","笑道","叹道",
-    "回答","解释","补充","强调","重复","告诉","吩咐","命令",
-    "提醒","建议","鼓励","安慰","承认","否认","批评",
-    "称赞","抱怨","回应","辩解","坦白","炫耀","吹嘘",
-    "咆哮","怒吼","惊呼","惊叫","失声","大吼","冷笑","苦笑","微笑",
-    "感叹","感慨","心想","暗想","寻思","沉思",
-    "问","答","说","道","喊","叫","骂","劝","叹"
+    "\u89e3\u91ca\u9053","\u8865\u5145\u9053","\u5f3a\u8c03\u9053","\u91cd\u590d\u9053","\u544a\u8bc9\u9053","\u5429\u5490\u9053","\u547d\u4ee4\u9053",
+    "\u63d0\u9192\u9053","\u5efa\u8bae\u9053","\u5b89\u6170\u9053","\u627f\u8ba4\u9053","\u5426\u8ba4\u9053","\u6279\u8bc4\u9053","\u79f0\u8d5e\u9053",
+    "\u62b1\u6028\u9053","\u56de\u5e94\u9053","\u8fa9\u89e3\u9053","\u5766\u767d\u9053","\u77ab\u8000\u9053","\u56de\u7b54\u9053",
+    "\u5f00\u5fc3\u9053","\u5e78\u798f\u9053","\u6d41\u6cea\u9053","\u54ed\u7740\u9053","\u7b11\u7740\u9053","\u4f4e\u58f0\u9053","\u5c0f\u58f0\u9053",
+    "\u5927\u58f0\u9053","\u5c16\u53eb\u9053","\u548b\u820c\u9053","\u65e0\u5948\u9053","\u53f9\u606f\u9053","\u6447\u5934\u9053","\u70b9\u5934\u9053",
+    "\u62ac\u5934\u9053","\u4f4e\u5934\u9053","\u56de\u5934\u9053","\u63d2\u5634\u9053","\u63a5\u53e3\u9053","\u63a5\u8bdd\u9053",
+    "\u5fcd\u4e0d\u4f4f\u9053","\u4e0d\u7981\u9053","\u4e0d\u7531\u9053",
+    "\u54c6\u54ee\u9053","\u6012\u543c\u9053","\u60ca\u547c\u9053","\u60ca\u53eb\u9053","\u5931\u58f0\u9053","\u5927\u543c\u9053",
+    "\u51b7\u7b11\u9053","\u82e6\u7b11\u9053","\u5fae\u7b11\u9053","\u611f\u53f9\u9053","\u611f\u6168\u9053",
+    "\u5fc3\u60f3\u9053","\u6697\u60f3\u9053","\u5bfb\u601d\u9053","\u6c89\u601d\u9053",
+    "\u56de\u7b54\u8bf4","\u89e3\u91ca\u8bf4","\u8865\u5145\u8bf4","\u5f3a\u8c03\u8bf4","\u91cd\u590d\u8bf4",
+    "\u544a\u8bc9\u8bf4","\u5429\u5490\u8bf4","\u547d\u4ee4\u8bf4","\u63d0\u9192\u8bf4","\u5efa\u8bae\u8bf4",
+    "\u9f13\u52b1\u8bf4","\u5b89\u6170\u8bf4","\u627f\u8ba4\u8bf4","\u5426\u8ba4\u8bf4","\u6279\u8bc4\u8bf4",
+    "\u79f0\u8d5e\u8bf4","\u62b1\u6028\u8bf4","\u56de\u5e94\u8bf4","\u8fa9\u89e3\u8bf4","\u5766\u767d\u8bf4",
+    "\u77ab\u8000\u8bf4","\u5439\u5618\u8bf4","\u80e1\u8bf4\u9053",
+    "\u95ee\u9053","\u8bf4\u9053","\u559d\u9053","\u53eb\u9053","\u54ed\u9053","\u543c\u9053","\u559d\u9053",
+    "\u9a82\u9053","\u7b11\u9053","\u53f9\u9053",
+    "\u56de\u7b54","\u89e3\u91ca","\u8865\u5145","\u5f3a\u8c03","\u91cd\u590d","\u544a\u8bc9","\u5429\u5490","\u547d\u4ee4",
+    "\u63d0\u9192","\u5efa\u8bae","\u9f13\u52b1","\u5b89\u6170","\u627f\u8ba4","\u5426\u8ba4","\u6279\u8bc4",
+    "\u79f0\u8d5e","\u62b1\u6028","\u56de\u5e94","\u8fa9\u89e3","\u5766\u767d","\u77ab\u8000","\u5439\u5618",
+    "\u54c6\u54ee","\u6012\u543c","\u60ca\u547c","\u60ca\u53eb","\u5931\u58f0","\u5927\u543c","\u51b7\u7b11","\u82e6\u7b11","\u5fae\u7b11",
+    "\u611f\u53f9","\u611f\u6168","\u5fc3\u60f3","\u6697\u60f3","\u5bfb\u601d","\u6c89\u601d",
+    "\u95ee","\u7b54","\u8bf4","\u9053","\u559d","\u53eb","\u9a82","\u529d","\u53f9"
   ],
 
   _isStopW(s) {
     var stops = {
-      "的":1,"了":1,"在":1,"有":1,"是":1,"不":1,"我":1,"你":1,"他":1,
-      "她":1,"它":1,"们":1,"这":1,"那":1,"什么":1,"怎么":1,"为什么":1,
-      "因为":1,"所以":1,"但是":1,"虽然":1,"如果":1,"而且":1,"然后":1,
-      "已经":1,"正在":1,"可以":1,"没有":1,"还是":1,"或者":1,"一个":1,
-      "这个":1,"那个":1,"这些":1,"那些":1,"一边":1,"心里":1,"心中":1,
-      "脑海":1,"嘴里":1,"口中":1,"背后":1,"面前":1,"眼前":1,"头上":1,
-      "脚下":1,"身上":1,"手里":1,"怀中":1,"对着":1,"看着|听着|想着|感觉|觉得|也|依旧|仍然|仍然|还是|已是|就是|便是|更是|越发|愈来愈|越来越|一个|那位|这位|那些|这些|某个|那个|这个":1,"看着|听着|想着|感觉|觉得|也|依旧|仍然|仍然|还是|已是|就是|便是|更是|越发|愈来愈|越来越|一个|那位|这位|那些|这些|某个|那个|这个":1,
-      "那里":1,"这里":1,"于是":1,"于是乎":1,"不过":1,"只是":1,"可是":1,
-      "但是":1,"然而":1,"虽然":1,"虽说":1,"忽然":1,"突然":1,"顿时":1,
-      "瞬间":1,"终于":1,"毕竟":1,"简直":1,"实在":1,"真的":1,"真是":1,
-      "只见":1,"一个":1,"那个":1,"这位":1,"那位":1,"我们":1,"你们":1,
-      "他们":1,"大家":1,"自己":1,"其中":1,"之间":1,"之后":1,"之前":1,
-      "的话":1,"时候":1,"地方":1,"结果":1,"原来":1,"其实":1,"当然":1,
-      "因为":1,"所以":1,"不过":1,"如果":1,"虽然":1,"虽然":1,"而且":1,
-      "反而":1,"甚至":1,"然后":1,"随后":1,"接着":1,"跟着":1,"按照":1,
-      "根据":1,"除了":1,"关于":1,"对于":1,"至于":1,"等到":1,"等到":1,
-      "尽管":1,"无论":1,"不论":1,"哪怕":1,"就算":1,"便是":1,"就是":1,
-      "却在这":1,"能站出":1,"也":1,"依旧":1,"仍然":1,"一个":1,"那位":1,"这位":1,"某个":1,"心中":1,"心里":1,"一边":1,"躺在地上":1,"的话":1,"的话还":1,"还没":1,"在下面":1,"在一边":1,"在那边":1,"在一旁":1,"对着林劫":1,"对着肖战":1,"不由的":1,"好奇的":1,"惊讶的":1,"得意的":1,"愤怒的":1,"轻蔑的":1,"嚣张的":1,"弱弱的":1,"不耐烦":1,"惊慌的":1,"不由的":1,"笑着":1,"的话刚":1,"的话还":1,"打字说":1,"打字":1,"回":1,"问":1,"说":1,"道":1,"亮的女":1,"在心中":1,"在心里":1,"在一边":1,
-      "在那边":1,"对着":1,"开口":1,"接着说":1,"继续说":1,"接过话":1
+      "\u7684":1,"\u4e86":1,"\u5728":1,"\u6709":1,"\u662f":1,"\u4e0d":1,"\u6211":1,"\u4f60":1,"\u4ed6":1,
+      "\u5979":1,"\u5b83":1,"\u4eec":1,"\u8fd9":1,"\u90a3":1,"\u4ec0\u4e48":1,"\u600e\u4e48":1,"\u4e3a\u4ec0\u4e48":1,
+      "\u56e0\u4e3a":1,"\u6240\u4ee5":1,"\u4f46\u662f":1,"\u867d\u7136":1,"\u5982\u679c":1,"\u800c\u4e14":1,"\u7136\u540e":1,
+      "\u5df2\u7ecf":1,"\u6b63\u5728":1,"\u53ef\u4ee5":1,"\u6ca1\u6709":1,"\u8fd8\u662f":1,"\u6216\u8005":1,"\u4e00\u4e2a":1,
+      "\u8fd9\u4e2a":1,"\u90a3\u4e2a":1,"\u8fd9\u4e9b":1,"\u90a3\u4e9b":1,"\u4e00\u8fb9":1,"\u5fc3\u91cc":1,"\u5fc3\u4e2d":1,
+      "\u8111\u6d77":1,"\u5634\u91cc":1,"\u53e3\u4e2d":1,"\u80cc\u540e":1,"\u9762\u524d":1,"\u773c\u524d":1,"\u5934\u4e0a":1,
+      "\u811a\u4e0b":1,"\u8eab\u4e0a":1,"\u624b\u91cc":1,"\u6000\u4e2d":1,"\u5bf9\u7740":1,
+      "\u770b\u7740":1,"\u542c\u7740":1,"\u60f3\u7740":1,"\u611f\u89c9":1,"\u89c9\u5f97":1,"\u4e5f":1,"\u4f9d\u65e7":1,
+      "\u4ecd\u7136":1,"\u8fd8\u662f":1,"\u5df2\u662f":1,"\u5c31\u662f":1,"\u4fbf\u662f":1,"\u66f4\u662f":1,
+      "\u90a3\u91cc":1,"\u8fd9\u91cc":1,"\u4e8e\u662f":1,"\u4e0d\u8fc7":1,"\u53ea\u662f":1,"\u53ef\u662f":1,
+      "\u4f46\u662f":1,"\u7136\u800c":1,"\u867d\u7136":1,"\u8bf4\u6655":1,
+      "\u5ffd\u7136":1,"\u7a81\u7136":1,"\u987f\u65f6":1,"\u77ac\u95f4":1,
+      "\u7ec8\u4e8e":1,"\u6bd5\u7adf":1,"\u7b80\u76f4":1,"\u5b9e\u5728":1,"\u771f\u7684":1,"\u771f\u662f":1,
+      "\u53ea\u89c1":1,"\u4e00\u4e2a":1,"\u90a3\u4f4d":1,"\u8fd9\u4f4d":1,"\u67d0\u4e2a":1,
+      "\u5374":1,"\u5c31":1,"\u53c8":1,"\u4e5f":1,"\u8fd8":1,"\u90fd":1,
     };
-    return !!stops[s];
+    return stops[s] === 1;
   },
 
-  // Strip trailing adverbs from a potential speaker name
-    _cleanName(s) {
-    // Remove trailing adverb/particle patterns
-    s = s.replace(/(?:的[\u4e00-\u9fff\u3000]*|地[\u4e00-\u9fff\u3000]*|睃|了|过|在[\u4e00-\u9fff\u3000]*|一边|不由得|不禁|突然)*$/g, "");
-    s = s.replace(/[\s\u3000：:,，。！？、、]+$/g, "");
+  _cleanName(s) {
+    if (!s) return "";
+    // Remove trailing adverbs
+    var adverbs = [
+      "\u5728\u5fc3\u4e2d","\u5fc3\u91cc","\u8111\u6d77\u4e2d","\u5634\u91cc","\u53e3\u4e2d","\u5728\u5fc3\u4e2d",
+      "\u4e00\u8fb9","\u5fcd\u4e0d\u4f4f","\u4e0d\u7981","\u4e0d\u7531",
+      "\u5fae\u5fae","\u7f13\u7f13","\u60f3\u4e86\u60f3","\u770b\u4e86\u770b",
+      "\u6c89\u9ed8\u4e86","\u8f6c\u8fc7\u8eab","\u56de\u8fc7\u5934",
+    ];
+    for (var a = 0; a < adverbs.length; a++) {
+      var ai = s.lastIndexOf(adverbs[a]);
+      if (ai >= 0 && ai >= s.length - 10) {
+        s = s.substring(0, ai).trim();
+        break;
+      }
+    }
+    // Remove trailing punctuation
+    s = s.replace(/[\u3000\uff0c\u3002\uff01\uff1f\u3001\u2014\u2026\s,.;!?]+$/, "").trim();
     return s;
   },
 
-  // --- CHAPTER EXTRACTION ---
   _extractChapters(lines) {
     var pats = this._chPatterns();
     var chapters = [];
@@ -179,42 +185,161 @@ const NovelParser = {
       chapters.push(cur);
     }
 
+    // If no chapters matched, treat all text as one chapter
     if (chapters.length === 0) {
-      chapters.push({ title: "全文", index: 1, content: this._parseChapterContent(lines) });
+      // Try to use year-based split for content without chapter headers
+      var yearLines = [];
+      var yearCur = null;
+      for (var yi = 0; yi < lines.length; yi++) {
+        var yl = lines[yi].trim();
+        if (/^\d{4}\s*\u5e74/.test(yl)) {
+          if (yearCur) {
+            yearCur.content = this._parseChapterContent(yearLines);
+            chapters.push(yearCur);
+            yearLines = [];
+          }
+          yearCur = { title: yl, index: chapters.length + 1, content: [] };
+        } else if (yearCur) {
+          yearLines.push(yl);
+        }
+      }
+      if (yearCur && yearLines.length > 0) {
+        yearCur.content = this._parseChapterContent(yearLines);
+        chapters.push(yearCur);
+      }
+      if (chapters.length === 0) {
+        chapters.push({ title: "\u5168\u6587", index: 1, content: this._parseChapterContent(lines) });
+      }
     }
 
     return chapters;
   },
 
-  // --- CHAPTER CONTENT PARSING ---
   _parseChapterContent(lines) {
     var blocks = [];
-    for (var i = 0; i < lines.length; i++) {
+    var i = 0;
+    while (i < lines.length) {
       var line = lines[i].trim();
-      if (!line) continue;
+      if (!line) { i++; continue; }
 
       var marker = this._detectSceneMarker(line);
-      if (marker) { blocks.push({ type: "scene_marker" }, marker); continue; }
+      if (marker) { blocks.push({ type: "scene_marker" }, marker); i++; continue; }
 
+      // Check for (??) markers
+      if (/^\(\u65c1\u767d\)/.test(line)) {
+        var narText = line.replace(/^\(\u65c1\u767d\)\s*/, "").trim();
+        if (!narText && i + 1 < lines.length) {
+          i++;
+          narText = lines[i].trim();
+          while (i + 1 < lines.length) {
+            var next = lines[i + 1].trim();
+            if (/^\(\u65c1\u767d\)/.test(next) || !next) { i++; continue; }
+            break;
+          }
+        }
+        blocks.push({ type: "narrative", text: narText || "(??)", description: narText || "(??)" });
+        i++;
+        continue;
+      }
+
+      // Check for Chinese ellipsis standalone line
+      if (/^(?:\u2026{2,})/.test(line)) {
+        blocks.push({ type: "action", description: "??", camera: "" });
+        i++;
+        continue;
+      }
+
+      // Check for quoted dialogue
       var dialogs = this._extractAllDialogs(line);
-      if (dialogs) { blocks = blocks.concat(dialogs); continue; }
+      if (dialogs) {
+        // Look back for standalone speaker name on previous line
+        if (i > 0 && dialogs.length > 0 && !dialogs[0].speaker) {
+          var prevLine = lines[i - 1].trim();
+          var prevIsName = /^[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6}$/.test(prevLine);
+          if (prevIsName && !this._isStopW(prevLine)) {
+            dialogs[0].speaker = prevLine;
+            for (var bi = blocks.length - 1; bi >= 0; bi--) {
+              if (blocks[bi].type === "narrative" && blocks[bi].text === prevLine) {
+                blocks.splice(bi, 1);
+                break;
+              }
+            }
+          }
+        }
+        blocks = blocks.concat(dialogs);
+        i++;
+        continue;
+      }
 
+      // Check for script-style dialogue: name on separate line
+      var isName = /^[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6}$/.test(line);
+      if (isName && !this._isStopW(line) && i + 1 < lines.length) {
+        var nextDialogs = this._extractAllDialogs(lines[i + 1].trim());
+        if (nextDialogs && nextDialogs.length > 0) {
+          if (!nextDialogs[0].speaker) nextDialogs[0].speaker = line;
+          blocks = blocks.concat(nextDialogs);
+          i += 2;
+          continue;
+        }
+      }
+
+      // Check for unquoted dialogue (screenplay format: name line followed by speech)
+      var isNameLine = /^[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6}$/.test(line);
+      if (isNameLine && !this._isStopW(line) && i + 1 < lines.length) {
+        var nextLine = lines[i + 1].trim();
+        var nextQuoted = this._extractAllDialogs(nextLine);
+        if (nextQuoted && nextQuoted.length > 0) {
+          if (!nextQuoted[0].speaker) nextQuoted[0].speaker = line;
+          blocks = blocks.concat(nextQuoted);
+          i += 2;
+          continue;
+        }
+        // If next line has no quotes but is a complete Chinese sentence, treat as unquoted dialogue
+        if (nextLine.length > 4 && /[\u3002\uff01\uff1f]/.test(nextLine)) {
+          blocks.push({ type: "dialogue", speaker: line, line: nextLine, delivery: "" });
+          i += 2;
+          continue;
+        }
+      }
+      // Check for (??) followed by narration on next line
+      if (/^\(\u65c1\u767d\)/.test(line)) {
+        var narText = line.replace(/^\(\u65c1\u767d\)\s*/, "").trim();
+        if (!narText && i + 1 < lines.length) {
+          i++;
+          narText = lines[i].trim();
+        }
+        blocks.push({ type: "narrative", text: narText || "(\u65c1\u767d)", description: narText || "(\u65c1\u767d)" });
+        i++;
+        continue;
+      }
+      // Check for Chinese ellipsis standalone
+      if (/^(?:\u2026{3,})/.test(line)) {
+        blocks.push({ type: "action", description: "\u2026\u2026", camera: "" });
+        i++;
+        continue;
+      }
       blocks.push({ type: "narrative", text: line, description: line });
+      i++;
     }
     return this._groupIntoScenes(blocks);
   },
 
-  // --- DIALOGUE EXTRACTION (core fix) ---
   _extractAllDialogs(line) {
     var results = [];
     var remaining = line.trim();
     var foundAny = false;
 
+    // Skip if no quotes at all
+    var hasAnyQuote = false;
+    for (var qi = 0; qi < remaining.length; qi++) {
+      if (this._isOpenQ(remaining[qi])) { hasAnyQuote = true; break; }
+    }
+    if (!hasAnyQuote) return null;
+
     while (remaining.length > 0) {
       remaining = remaining.trim();
       if (!remaining) break;
 
-      // Find opening quote
       var qs = -1;
       for (var j = 0; j < remaining.length; j++) {
         if (this._isOpenQ(remaining[j])) { qs = j; break; }
@@ -230,90 +355,87 @@ const NovelParser = {
       var after = remaining.substring(qe + 1).trim();
 
       var speaker = null;
-
-      // CASE 1: Speaker before quote: "name VERB: dialogue"
-      if (before) {
-        speaker = this._speakerBefore(before);
-      }
-
-      // CASE 2: Speaker after quote: "dialogue" name VERB
-      if (!speaker && after) {
-        speaker = this._speakerAfter(after);
-      }
+      if (before) { speaker = this._speakerBefore(before); }
+      if (!speaker && after) { speaker = this._speakerAfter(after); }
 
       results.push({ type: "dialogue", speaker: speaker || "", line: text, delivery: "" });
       foundAny = true;
       remaining = after;
     }
 
+    // Normalize Chinese ellipsis in dialogue text
+    for (var ri = 0; ri < results.length; ri++) {
+      if (results[ri].line) {
+        results[ri].line = results[ri].line.replace(/\u2026{2,}/g, "??");
+      }
+    }
+
     return foundAny ? results : null;
   },
 
-  // Extract speaker from text BEFORE a quote
   _speakerBefore(text) {
     var verbs = this._speechVerbs;
     var bestIdx = -1;
     var bestVerb = null;
-
     for (var v = 0; v < verbs.length; v++) {
       var idx = text.lastIndexOf(verbs[v]);
       if (idx > bestIdx) { bestIdx = idx; bestVerb = verbs[v]; }
     }
 
-    if (bestVerb === null || bestIdx < 0) return null;
+    if (bestVerb === null || bestIdx < 0) {
+      var clean = this._cleanName(text);
+      var m = clean.match(/([\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6})$/);
+      if (m && !this._isStopW(m[1]) && m[1] !== "\u5374" && m[1] !== "\u5c31") return m[1];
+      return null;
+    }
 
     var beforeVerb = text.substring(0, bestIdx).trim();
     if (!beforeVerb) return null;
-
-    // Clean: strip trailing adverbs/particles
     beforeVerb = this._cleanName(beforeVerb);
     if (!beforeVerb) return null;
 
-    // Take last 1-6 Chinese/Latin chars
     var m = beforeVerb.match(/([\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6})$/);
     if (m && !this._isStopW(m[1])) return m[1];
 
-    // Fallback: last 2-4 Chinese chars
     var fb = beforeVerb.match(/([\u4e00-\u9fff]{2,4})$/);
     return fb ? fb[1] : null;
   },
 
-  // Extract speaker from text AFTER a quote
   _speakerAfter(text) {
     var verbs = this._speechVerbs;
     var bestIdx = 999999;
     var bestVerb = null;
-
     for (var v = 0; v < verbs.length; v++) {
       var idx = text.indexOf(verbs[v]);
       if (idx >= 0 && idx < bestIdx) { bestIdx = idx; bestVerb = verbs[v]; }
     }
 
-    if (bestVerb === null || bestIdx < 0) return null;
+    if (bestVerb === null || bestIdx < 0) {
+      var m = text.match(/^([\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6})[\s\u3000]/);
+      if (m && !this._isStopW(m[1])) return m[1];
+      return null;
+    }
 
     var beforeVerb = text.substring(0, bestIdx).trim();
     if (!beforeVerb) return null;
-
-    // The name should be immediately before the verb (1-6 chars)
     var m = beforeVerb.match(/^[\s\u3000]*([\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6})$/);
     if (m && !this._isStopW(m[1])) return m[1];
-
     return null;
   },
 
   _detectSceneMarker(line) {
     var m = {};
     var ok = false;
-    if (/^(?:场景|地点|场景[：:]|地点[：:])/.test(line)) {
-      m.location = line.replace(/^(?:场景|地点|场景[：:]|地点[：:])\s*/, "").trim();
+    if (/^(?:\u573a\u666f|\u5730\u70b9|\u573a\u666f[\uff1a:]|\u5730\u70b9[\uff1a:])/.test(line)) {
+      m.location = line.replace(/^(?:\u573a\u666f|\u5730\u70b9|\u573a\u666f[\uff1a:]|\u5730\u70b9[\uff1a:])\s*/, "").trim();
       ok = true;
     }
-    if (/^(?:时间|时间[：:])/.test(line)) {
-      m.time = line.replace(/^(?:时间|时间[：:])\s*/, "").trim();
+    if (/^(?:\u65f6\u95f4|\u65f6\u95f4[\uff1a:])/.test(line)) {
+      m.time = line.replace(/^(?:\u65f6\u95f4|\u65f6\u95f4[\uff1a:])\s*/, "").trim();
       ok = true;
     }
-    if (/^(?:天气|天气[：:])/.test(line)) {
-      m.weather = line.replace(/^(?:天气|天气[：:])\s*/, "").trim();
+    if (/^(?:\u5929\u6c14|\u5929\u6c14[\uff1a:])/.test(line)) {
+      m.weather = line.replace(/^(?:\u5929\u6c14|\u5929\u6c14[\uff1a:])\s*/, "").trim();
       ok = true;
     }
     return ok ? m : null;
@@ -365,7 +487,7 @@ const NovelParser = {
     return names.map(function(n, i) {
       return {
         id: "char_" + String(i + 1).padStart(3, "0"),
-        name: n, alias: [], description: "", personality: [], role: "未知",
+        name: n, alias: [], description: "", personality: [], role: "\u672a\u77e5",
       };
     });
   },
@@ -374,7 +496,3 @@ const NovelParser = {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = NovelParser;
 }
-
-
-
-
