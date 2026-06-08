@@ -1,4 +1,22 @@
-var AIService = {
+﻿var AIService = {
+  // Auto-load config from server .env on startup
+  loadEnvConfig: function() {
+    var self = this;
+    fetch('/api/config').then(function(r){ return r.json(); }).then(function(cfg){
+      if (cfg.ai_api_key) {
+        self.config.apiKey = cfg.ai_api_key;
+        self.config.endpoint = cfg.ai_endpoint || self.config.endpoint;
+        self.config.model = cfg.ai_model || self.config.model;
+        self.config.provider = cfg.ai_provider || self.config.provider;
+        localStorage.setItem("ai_apikey", cfg.ai_api_key);
+        localStorage.setItem("ai_endpoint", cfg.ai_endpoint || self.config.endpoint);
+        localStorage.setItem("ai_model", cfg.ai_model || self.config.model);
+        localStorage.setItem("ai_provider", cfg.ai_provider || self.config.provider);
+        console.log('✦ Loaded AI config from server .env');
+      }
+    }).catch(function(){});
+  },
+
   config: {
     endpoint: localStorage.getItem("ai_endpoint") || "https://api.deepseek.com/v1",
     model: localStorage.getItem("ai_model") || "deepseek-chat",
@@ -59,8 +77,7 @@ var AIService = {
 
   // Analyze characters from novel text
   analyzeCharacters: function(text) {
-    var prompt = "\u8bf7\u5206\u6790\u4ee5\u4e0b\u5c0f\u8bf4\u4e2d\u7684\u4e3b\u8981\u89d2\u8272\uff0c\u5305\u62ec\uff1a\u6027\u683c\u7279\u5f81\u3001\u6210\u957f\u53d8\u5316\u3001\u4eba\u7269\u5173\u7cfb\u3001\u89d2\u8272\u5b9a\u4f4d?
-" + text.substring(0, 8000);
+    var prompt = "\u8bf7\u5206\u6790\u4ee5\u4e0b\u5c0f\u8bf4\u4e2d\u7684\u4e3b\u8981\u89d2\u8272\uff0c\u5305\u62ec\uff1a\u6027\u683c\u7279\u5f81\u3001\u6210\u957f\u53d8\u5316\u3001\u4eba\u7269\u5173\u7cfb\u3001\u89d2\u8272\u5b9a\u4f4d?" + text.substring(0, 8000);
     return this.call([
       { role: "system", content: "\u4f60\u662f\u4e00\u4f4d\u4e13\u4e1a\u7684\u89d2\u8272\u5206\u6790\u5e08\uff0c\u64c5\u957f\u4ece\u6587\u5b66\u4f5c\u54c1\u4e2d\u63d0\u53d6\u548c\u5206\u6790\u89d2\u8272\u7279\u5f81\u3002" },
       { role: "user", content: prompt }
@@ -105,3 +122,4 @@ var AIService = {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = AIService;
 }
+

@@ -5,6 +5,31 @@ const path = require('path');
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
+// Simple .env loader
+(function loadEnv() {
+  var envPath = require('path').join(__dirname, '..', '.env');
+  try {
+    if (require('fs').existsSync(envPath)) {
+      var lines = require('fs').readFileSync(envPath, 'utf-8').split('\n');
+      lines.forEach(function(line) {
+        line = line.trim();
+        if (!line || line.startsWith('#')) return;
+        var eqIdx = line.indexOf('=');
+        if (eqIdx < 1) return;
+        var key = line.substring(0, eqIdx).trim();
+        var val = line.substring(eqIdx + 1).trim();
+        if (key && !process.env[key]) {
+          process.env[key] = val;
+        }
+      });
+      console.log('✦ Loaded .env configuration');
+    }
+  } catch(e) {
+    // .env file is optional
+  }
+})();
+
+
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -53,6 +78,19 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+
+  if (req.method === 'GET' && req.url === '/api/config') {
+    var envConfig = {
+      ai_provider: process.env.AI_PROVIDER || '',
+      ai_endpoint: process.env.AI_ENDPOINT || '',
+      ai_model: process.env.AI_MODEL || '',
+      ai_api_key: process.env.AI_API_KEY || '',
+      port: process.env.PORT || '3000',
+    };
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(envConfig));
+    return;
+  }
   let filePath = path.join(PUBLIC_DIR, req.url === '/' ? 'index.html' : req.url);
   const ext = path.extname(filePath);
 
@@ -77,3 +115,5 @@ server.listen(PORT, () => {
   console.log('✦ NovelToScript Server running at http://localhost:' + p);
   console.log('✦ Open your browser and navigate to http://localhost:' + p);
 });
+
+

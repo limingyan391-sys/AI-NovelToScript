@@ -164,8 +164,6 @@ const NovelParser = {
     return true;
   },
 
-  },
-
   _cleanName(s) {
     if (!s) return "";
     // Remove trailing adverbs

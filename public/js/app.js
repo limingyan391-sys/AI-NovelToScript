@@ -17,6 +17,8 @@
       this.initTheme();
       this.loadExample();
       console.log('✦ NovelToScript initialized');
+      // Load AI config from server .env
+      if (typeof AIService !== 'undefined' && AIService.loadEnvConfig) AIService.loadEnvConfig();
     },
 
     bindEvents() {
