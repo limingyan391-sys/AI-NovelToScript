@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NovelToScript - AI 辅助剧本创作工具</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✍</text></svg>">
+</head>
+<body class="dark-theme">
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">正在分析小说文本...</div>
+  </div>
+
+  <!-- Character Edit Modal -->
+  <div class="modal-overlay" id="charModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">✎ 编辑角色信息</span>
+        <button class="modal-close" onclick="document.getElementById('charModal').classList.remove('active')">✕</button>
+      </div>
+      <div class="char-edit-form">
+        <input type="hidden" id="editCharId">
+        <div class="form-group">
+          <label class="form-label">角色名称</label>
+          <input class="form-input" id="editCharName" placeholder="角色名">
+        </div>
+        <div class="form-group">
+          <label class="form-label">角色定位</label>
+          <select class="form-select" id="editCharRole">
+            <option value="主角">主角</option>
+            <option value="主要角色">主要角色</option>
+            <option value="重要配角">重要配角</option>
+            <option value="配角">配角</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">性格特征（用顿号分隔）</label>
+          <input class="form-input" id="editCharPersonality" placeholder="如：勇敢、执着、幽默">
+        </div>
+        <div class="form-group">
+          <label class="form-label">角色描述</label>
+          <textarea class="form-textarea" id="editCharDesc" placeholder="简要描述角色的外貌、背景等"></textarea>
+        </div>
+        <button class="btn btn-primary" id="saveCharBtn" style="width:100%;justify-content:center">保存修改</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-icon">✦</div>
+        <span>NovelToScript</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeToggle" title="切换主题">🌓</button>
+      </div>
+    </header>
+
+    <!-- INPUT SECTION -->
+    <div class="input-section">
+      <div class="input-header">
+        <div class="input-meta">
+          <input type="text" id="novelTitle" placeholder="作品名称" value="">
+          <input type="text" id="novelAuthor" placeholder="作者" value="">
+          <div class="format-selector">
+            <button class="format-btn active" data-format="film">电影剧本</button>
+            <button class="format-btn" data-format="tv_episode">电视剧本</button>
+            <button class="format-btn" data-format="stage_play">舞台剧本</button>
+          </div>
+        </div>
+      </div>
+
+      <textarea class="novel-textarea" id="novelInput" placeholder="在此粘贴小说文本，或通过下方按钮加载示例小说&#10;&#10;支持格式：&#10;- 章节标题（第一章、第1章、Chapter 1 等）&#10;- 场景标记（场景：、地点：、时间：、天气：）&#10;- 对话解析（「」、""""、"""" 引号）&#10;- 至少3个章节可获得最佳效果"></textarea>
+
+      <div class="input-toolbar">
+        <div class="toolbar-left">
+          <button class="btn btn-primary" id="convertBtn">✦ 开始转换</button>
+          <label class="btn btn-secondary" style="cursor:pointer">
+            📁 上传文件
+            <input type="file" id="fileInput" accept=".txt,.md" style="display:none">
+          </label>
+          <button class="btn btn-ghost btn-sm" id="loadExampleBtn">📖 加载示例</button>
+          <div class="sample-btns">
+            <button class="sample-btn" data-sample="wuxia">武侠</button>
+            <button class="sample-btn" data-sample="xianxia">仙侠</button>
+            <button class="sample-btn" data-sample="urban">都市悬疑</button>
+          </div>
+        </div>
+        <span style="font-size:0.75rem;color:var(--text-muted)">✨ 零依赖 · 浏览器端处理 · 数据不上传</span>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-container">
+      <nav class="tabs-nav">
+        <button class="tab-btn active" data-tab="preview">📖 剧本预览</button>
+        <button class="tab-btn" data-tab="characters">👥 角色管理</button>
+        <button class="tab-btn" data-tab="timeline">📍 场景时间线</button>
+        <button class="tab-btn" data-tab="script">📄 YAML/JSON 导出</button>
+        <button class="tab-btn" data-tab="stats">📊 作品分析</button>
+      </nav>
+
+      <!-- Tab: Preview -->
+      <div class="tab-content active" id="tab-preview">
+        <div class="stats-bar">
+          <div class="stat-card"><div class="stat-number" id="statChapters">0</div><div class="stat-label">章节</div></div>
+          <div class="stat-card"><div class="stat-number" id="statScenes">0</div><div class="stat-label">场景</div></div>
+          <div class="stat-card"><div class="stat-number" id="statCharacters">0</div><div class="stat-label">角色</div></div>
+          <div class="stat-card"><div class="stat-number" id="statPages">0</div><div class="stat-label">预估页数</div></div>
+        </div>
+        <div id="previewContent">
+          <div class="empty-state">
+            <div class="empty-icon">✦</div>
+            <div>输入小说文本，点击「开始转换」生成剧本初稿</div>
+            <div style="margin-top:8px;font-size:0.8rem">支持自动识别章节、对话、场景信息</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Characters -->
+      <div class="tab-content" id="tab-characters">
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">自动识别小说中的角色，可点击编辑图标完善角色信息</p>
+        <div id="charactersContent">
+          <div class="empty-state"><div class="empty-icon">👥</div><div>转换小说后自动提取角色列表</div></div>
+        </div>
+      </div>
+
+      <!-- Tab: Timeline -->
+      <div class="tab-content" id="tab-timeline">
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">按地点和场景序列展示剧情发展脉络。提示：在小说中添加「地点：」「时间：」标记可获得更精确的时间线</p>
+        <div id="timelineContent">
+          <div class="empty-state"><div class="empty-icon">📍</div><div>转换小说后自动生成场景时间线</div></div>
+        </div>
+      </div>
+
+      <!-- Tab: Script (YAML/JSON) -->
+      <div class="tab-content" id="tab-script">
+        <div class="export-bar">
+          <button class="btn btn-primary btn-sm" id="exportYamlBtn">⬇ 下载 YAML</button>
+          <button class="btn btn-secondary btn-sm" id="exportJsonBtn">⬇ 下载 JSON</button>
+          <button class="btn btn-warm btn-sm" id="exportTxtBtn">⬇ 导出可读剧本</button>
+        </div>
+        <div class="yaml-view-container">
+          <div class="yaml-panes">
+            <div class="yaml-pane active" id="pane-yaml">
+              <div class="pane-toolbar"><button class="copy-btn" id="copyYamlBtn">📋 复制</button></div>
+              <pre class="yaml-output">转换后显示 YAML 格式的剧本数据</pre>
+            </div>
+            <div class="yaml-pane" id="pane-json">
+              <div class="pane-toolbar"><button class="copy-btn" id="copyJsonBtn">📋 复制</button></div>
+              <pre class="json-output">转换后显示 JSON 格式的剧本数据</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Stats -->
+      <div class="tab-content" id="tab-stats">
+        <div id="statsContent">
+          <div class="empty-state"><div class="empty-icon">📊</div><div>转换小说后生成详细的作品分析</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer style="text-align:center;padding:40px 0 24px;color:var(--text-muted);font-size:0.8rem;border-top:1px solid var(--border-color);margin-top:40px">
+      <p>NovelToScript · AI 辅助剧本创作工具 · 所有处理在浏览器端完成</p>
+      <p style="margin-top:4px">建议配合 <a href="schema/screenplay-schema.md" style="color:var(--accent-primary);text-decoration:none">YAML Schema 文档</a> 使用</p>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/parser.js"></script>
+  <script src="js/script-converter.js"></script>
+  <script src="js/yaml-writer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

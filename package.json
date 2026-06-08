@@ -1,0 +1,13 @@
+﻿{
+  "name": "noveltoscript",
+  "version": "1.0.0",
+  "description": "✦ AI 辅助剧本创作工具 - 将小说自动转换为结构化剧本",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "keywords": ["novel", "screenplay", "script", "writing", "AI"],
+  "author": "NovelToScript",
+  "license": "MIT"
+}
