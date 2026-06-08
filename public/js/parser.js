@@ -227,32 +227,38 @@ const NovelParser = {
   _parseChapterContent(lines) {
     var blocks = [];
     var i = 0;
+    var pendingNarr = null;
+
+    function flushNarr() {
+      if (pendingNarr) {
+        blocks.push({ type: "narrative", text: pendingNarr, description: pendingNarr });
+        pendingNarr = null;
+      }
+    }
+
     while (i < lines.length) {
       var line = lines[i].trim();
       if (!line) { i++; continue; }
 
       var marker = this._detectSceneMarker(line);
-      if (marker) { blocks.push({ type: "scene_marker" }, marker); i++; continue; }
+      if (marker) { flushNarr(); blocks.push({ type: "scene_marker" }, marker); i++; continue; }
 
       // Check for (??) markers
-      if (/^\(\u65c1\u767d\)/.test(line)) {
-        var narText = line.replace(/^\(\u65c1\u767d\)\s*/, "").trim();
+      if (/^\u0028\u65c1\u767d\u0029/.test(line)) {
+        flushNarr();
+        var narText = line.replace(/^\u0028\u65c1\u767d\u0029\s*/, "").trim();
         if (!narText && i + 1 < lines.length) {
           i++;
           narText = lines[i].trim();
-          while (i + 1 < lines.length) {
-            var next = lines[i + 1].trim();
-            if (/^\(\u65c1\u767d\)/.test(next) || !next) { i++; continue; }
-            break;
-          }
         }
-        blocks.push({ type: "narrative", text: narText || "(??)", description: narText || "(??)" });
+        pendingNarr = narText || "(??)";
         i++;
         continue;
       }
 
-      // Check for Chinese ellipsis standalone line
+      // Check for Chinese ellipsis standalone
       if (/^(?:\u2026{2,})/.test(line)) {
+        flushNarr();
         blocks.push({ type: "action", description: "??", camera: "" });
         i++;
         continue;
@@ -261,12 +267,13 @@ const NovelParser = {
       // Check for quoted dialogue
       var dialogs = this._extractAllDialogs(line);
       if (dialogs) {
-        // Look back for standalone speaker name on previous line
+        flushNarr();
         if (i > 0 && dialogs.length > 0 && !dialogs[0].speaker) {
           var prevLine = lines[i - 1].trim();
           var prevIsName = /^[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6}$/.test(prevLine);
           if (prevIsName && !this._isStopW(prevLine)) {
             dialogs[0].speaker = prevLine;
+            // Remove if prev line was added as narration
             for (var bi = blocks.length - 1; bi >= 0; bi--) {
               if (blocks[bi].type === "narrative" && blocks[bi].text === prevLine) {
                 blocks.splice(bi, 1);
@@ -280,59 +287,38 @@ const NovelParser = {
         continue;
       }
 
-      // Check for script-style dialogue: name on separate line
-      var isName = /^[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6}$/.test(line);
-      if (isName && !this._isStopW(line) && i + 1 < lines.length) {
-        var nextDialogs = this._extractAllDialogs(lines[i + 1].trim());
-        if (nextDialogs && nextDialogs.length > 0) {
-          if (!nextDialogs[0].speaker) nextDialogs[0].speaker = line;
-          blocks = blocks.concat(nextDialogs);
-          i += 2;
-          continue;
-        }
-      }
-
-      // Check for unquoted dialogue (screenplay format: name line followed by speech)
+      // Check for unquoted dialogue (screenplay format)
       var isNameLine = /^[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]{1,6}$/.test(line);
       if (isNameLine && !this._isStopW(line) && i + 1 < lines.length) {
         var nextLine = lines[i + 1].trim();
         var nextQuoted = this._extractAllDialogs(nextLine);
         if (nextQuoted && nextQuoted.length > 0) {
+          flushNarr();
           if (!nextQuoted[0].speaker) nextQuoted[0].speaker = line;
           blocks = blocks.concat(nextQuoted);
           i += 2;
           continue;
         }
-        // If next line has no quotes but is a complete Chinese sentence, treat as unquoted dialogue
+        // Unquoted dialogue
         if (nextLine.length > 4 && /[\u3002\uff01\uff1f]/.test(nextLine)) {
+          flushNarr();
           blocks.push({ type: "dialogue", speaker: line, line: nextLine, delivery: "" });
           i += 2;
           continue;
         }
       }
-      // Check for (??) followed by narration on next line
-      if (/^\(\u65c1\u767d\)/.test(line)) {
-        var narText = line.replace(/^\(\u65c1\u767d\)\s*/, "").trim();
-        if (!narText && i + 1 < lines.length) {
-          i++;
-          narText = lines[i].trim();
-        }
-        blocks.push({ type: "narrative", text: narText || "(\u65c1\u767d)", description: narText || "(\u65c1\u767d)" });
-        i++;
-        continue;
+
+      // Default: accumulate as narrative text (combine consecutive lines)
+      if (pendingNarr) {
+        pendingNarr += "\n" + line;
+      } else {
+        pendingNarr = line;
       }
-      // Check for Chinese ellipsis standalone
-      if (/^(?:\u2026{3,})/.test(line)) {
-        blocks.push({ type: "action", description: "\u2026\u2026", camera: "" });
-        i++;
-        continue;
-      }
-      blocks.push({ type: "narrative", text: line, description: line });
       i++;
     }
+    flushNarr();
     return this._groupIntoScenes(blocks);
   },
-
   _extractAllDialogs(line) {
     var results = [];
     var remaining = line.trim();
@@ -453,25 +439,40 @@ const NovelParser = {
   _groupIntoScenes(blocks) {
     var scenes = [];
     var ctr = 0;
-    var cur = { id: "scene_001", setting: { location: "", time: "", weather: "" }, synopsis: "", content: [] };
+    var cur = null;
 
     for (var b = 0; b < blocks.length; b++) {
       var block = blocks[b];
       if (block.type === "scene_marker") {
-        if (cur.content.length > 0 || ctr === 0) {
-          if (ctr > 0) scenes.push(cur);
+        if (!cur) {
           ctr++;
-          cur = { id: "scene_" + String(ctr + 1).padStart(3, "0"), setting: {}, synopsis: "", content: [] };
-          cur.setting = { location: "", time: "", weather: "" };
+          cur = { id: "scene_" + String(ctr).padStart(3, "0"), setting: { location: "", time: "", weather: "" }, synopsis: "", content: [] };
         }
         if (block.location !== undefined) cur.setting.location = block.location;
         if (block.time !== undefined) cur.setting.time = block.time;
         if (block.weather !== undefined) cur.setting.weather = block.weather;
       } else {
+        if (!cur) {
+          ctr++;
+          cur = { id: "scene_" + String(ctr).padStart(3, "0"), setting: { location: "", time: "", weather: "" }, synopsis: "", content: [] };
+        }
         cur.content.push(block);
       }
     }
-    if (cur.content.length > 0 || ctr === 0) scenes.push(cur);
+    // Split into multiple scenes if content exceeds threshold
+    if (cur && cur.content.length > 50) {
+      var chunks = [];
+      for (var ci = 0; ci < cur.content.length; ci += 20) {
+        chunks.push(cur.content.slice(ci, ci + 20));
+      }
+      for (var ci = 0; ci < chunks.length; ci++) {
+        ctr++;
+        scenes.push({ id: "scene_" + String(ctr).padStart(3, "0"), setting: Object.assign({}, cur.setting), synopsis: "", content: chunks[ci] });
+      }
+    } else if (cur) {
+      scenes.push(cur);
+    }
+    if (scenes.length === 0) { scenes.push({ id: "scene_001", setting: { location: "", time: "", weather: "" }, synopsis: "", content: [] }); }
     return scenes;
   },
 
